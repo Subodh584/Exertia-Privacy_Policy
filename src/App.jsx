@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 
 const CONTACT_EMAIL = 'exertia.game@gmail.com'
 
@@ -257,8 +258,51 @@ function ContactSection() {
 export default function App() {
   useHashScroll()
 
+  // Pre-compute star positions so they don't shift on re-render
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 120 }).map(() => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        width: `${1 + Math.random() * 2}px`,
+        height: `${1 + Math.random() * 2}px`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${2 + Math.random() * 3}s`,
+      })),
+    []
+  )
+
+  // Background effects rendered via portal so they sit outside #root
+  const backgroundEffects = createPortal(
+    <>
+      {/* Aurora */}
+      <div className="aurora">
+        <div className="aurora__layer aurora__layer--1" />
+        <div className="aurora__layer aurora__layer--2" />
+        <div className="aurora__layer aurora__layer--3" />
+        <div className="aurora__layer aurora__layer--4" />
+      </div>
+
+      {/* Twinkling stars */}
+      <div className="stars-field">
+        {stars.map((s, i) => (
+          <div key={i} className="twinkle-star" style={s} />
+        ))}
+      </div>
+
+      {/* Shooting stars */}
+      <div className="shooting-stars">
+        <div className="shooting-star" />
+        <div className="shooting-star" />
+      </div>
+    </>,
+    document.body
+  )
+
   return (
     <>
+      {backgroundEffects}
+
       <nav className="navbar">
         <div className="container">
           <span className="nav-logo">EXERTIA</span>
